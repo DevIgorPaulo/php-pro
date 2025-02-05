@@ -12,6 +12,36 @@ function exactMatchUri($uri, $routes){
     return [];
 }
 
+function dynamicMatchUri($uri, $routes){
+    return array_filter(
+        $routes, 
+        function($value) use ($uri){
+            $regex = str_replace('/', '\/', ltrim($value, '/'));
+            return preg_match("/^$regex$/", ltrim($uri, '/'));
+        }, ARRAY_FILTER_USE_KEY
+    );
+}
+
+function params($uri, $matchedUri){
+    if(!empty($matchedUri)){
+        return array_diff(
+            $uri,
+            explode('/', ltrim(array_keys($matchedUri)[0], '/'))
+        );
+    }
+
+    return [];
+}
+
+function paramsFormat($uri, $params){
+    $paramsData = [];
+    foreach ($params as $index => $param) {
+        $paramsData[$uri[$index - 1]] = $param;
+    }
+
+    return $paramsData;
+}
+
 function router(){
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
@@ -19,13 +49,21 @@ function router(){
     
     $matchedUri = exactMatchUri($uri, $routes);
 
-    if(empty($matchedUri))
+    $params = [];
 
-    $matchedUri = array_filter(
-        $routes, 
-        function($value) use ($uri){
-            $regex = str_replace('/', '\/', ltrim($value, '/'));
-            return preg_match("/^$regex$/", ltrim($uri, '/'));
-        }, ARRAY_FILTER_USE_KEY
-    );
+    if(empty($matchedUri)){
+        $matchedUri = dynamicMatchUri($uri, $routes);
+
+        $uri = explode('/', ltrim($uri, '/'));
+
+        $params = params($uri, $matchedUri);
+        $params = paramsFormat($uri, $params);
+ 
+    }
+
+    if(!empty($matchedUri)){
+        controller($matchedUri, $params);
+    }
+
+    throw new Exception('Algo deu errado');
 }

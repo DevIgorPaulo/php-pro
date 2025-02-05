@@ -5,10 +5,11 @@
     "autoload": {
         "files":[
             "app/helpers/constants.php",
-            "app/router/router.php"
+            "app/router/router.php",
+            "app/core/controller.php"
         ],
         "psr-4": {
-            "App\\": "app"
+            "app\\": "app"
         }
     },
     "authors": [
