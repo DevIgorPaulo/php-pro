@@ -13,6 +13,12 @@ class User{
     }
 
     public function show($params){
-        var_dump($params);
+        if(!isset($params['user'])){
+            redirect("/");  
+        }
+
+        $user = findBy("users", "id", "*", $params['user']);
+
+        var_dump($user);
     }
 }
