@@ -7,6 +7,9 @@
     <title><?= $title ?></title>
 </head>
 <body>
+    <div id="header">
+        <?php require VIEWS.'/partials/header.php'; ?>
+    </div>
     <div class="container">
         <?php require VIEWS.$view; ?>
     </div>
